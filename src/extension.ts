@@ -1,22 +1,22 @@
 'use strict'
 
 import * as vscode from 'vscode'
-import { NaiveSearch, isSearchAvail } from './search'
+import { NaiveGoToDefinition, isSearchAvail } from './search'
 
-let errorMessageShown = false
+let unavailMessageShown = false
 
 export function activate(context: vscode.ExtensionContext) {
   console.log('activated')
   // let config = vscode.workspace.getConfiguration('naivedefinitions')
   if (!isSearchAvail()) {
-    if (!errorMessageShown) {
-      errorMessageShown = true
+    if (!unavailMessageShown) {
+      unavailMessageShown = true
       vscode.window.showErrorMessage(`"ripgrep" not installed, ""`)
     }
   } else {
     context.subscriptions.push(
       vscode.languages.registerDefinitionProvider('javascript', {
-        provideDefinition: NaiveSearch,
+        provideDefinition: NaiveGoToDefinition,
       })
     )
   }
