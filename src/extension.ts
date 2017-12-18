@@ -6,6 +6,7 @@ import { NaiveGoToDefinition, isSearchAvail } from './provider'
 let unavailMessageShown = false
 
 export function activate(context: vscode.ExtensionContext) {
+  console.log('============================ac')
   if (!isSearchAvail()) {
     if (!unavailMessageShown) {
       unavailMessageShown = true
@@ -16,6 +17,9 @@ export function activate(context: vscode.ExtensionContext) {
   } else {
     context.subscriptions.push(
       vscode.languages.registerDefinitionProvider('javascript', {
+        provideDefinition: NaiveGoToDefinition,
+      }),
+      vscode.languages.registerDefinitionProvider('javascriptreact', {
         provideDefinition: NaiveGoToDefinition,
       })
     )

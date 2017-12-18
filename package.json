@@ -17,7 +17,7 @@
     "vscode": "^1.0.0"
   },
   "categories": ["Languages"],
-  "activationEvents": ["onLanguage:javascript"],
+  "activationEvents": ["onLanguage:javascript", "onLanguage:javascriptreact"],
   "main": "./out/src/extension",
   "contributes": {
     "commands": [

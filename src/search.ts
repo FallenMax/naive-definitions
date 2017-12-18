@@ -37,6 +37,12 @@ async function search({
           columnEnd: columnNum + word.length,
         }
       })
+      .sort(
+        (a, b) =>
+          a.file === b.file
+            ? a.line === b.line ? a.column - b.column : a.line - b.line
+            : a.file < b.file ? -1 : 1
+      )
     return locations
   }
   const command = [
@@ -49,7 +55,7 @@ async function search({
     ...patterns.map(p => ` -e '${p}'`),
   ].join(' ')
 
-  // console.log('command ', command)
+  console.log('command ', command)
   const { stdout, stderr } = await run(command, {
     cwd: directory,
     timeout: 5000,
@@ -68,20 +74,26 @@ export async function searchForDefinition(word: string, directory: string) {
     `(var|let|const)[^=]+\\b${word}\\b`,
 
     // word =
-    `\\b${word}\\b[^=]*=`,
+    `\\b${word}\\b[^=]*=[^=]`,
 
     // function word (){}
     `\\bfunction\\b.*\\b${word}\\b`,
+
+    // word: someValue
+    `\\b${word}\\b\s*:`,
   ]
 
   return Promise.race([
-    wait(2000).then(e => {
+    wait(5000).then(e => {
       throw new Error('ERR_RG_TIMEOUT')
     }),
     search({
       word,
       patterns,
       directory,
-    }).catch(e => [] as Location[]),
-  ])
+    }),
+  ]).catch(e => {
+    console.error('[naive-definitions]', e)
+    return [] as Location[]
+  })
 }

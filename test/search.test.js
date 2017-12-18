@@ -9,6 +9,7 @@ test('(var|let|const) word', async () => {
   expect(await searchForDefinition('a1', inputPath)).toEqual([
     { column: 4, columnEnd: 6, file: 'file2.js', line: 0, lineEnd: 0 },
     { column: 4, columnEnd: 6, file: 'file1.js', line: 0, lineEnd: 0 },
+    {"column": 4, "columnEnd": 6, "file": "subfolder/file4.js", "line": 0, "lineEnd": 0}
   ])
 
   expect(await searchForDefinition('a2', inputPath)).toEqual([
