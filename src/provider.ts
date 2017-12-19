@@ -5,8 +5,6 @@ import { extname, dirname, join } from 'path'
 import { exec, execSync, ExecOptions, ExecFileOptions } from 'child_process'
 import { commands } from 'vscode'
 
-let ignoreNextSearch = false
-
 export function isSearchAvail() {
   try {
     const out = execSync('rg -V', { encoding: 'utf8' })
@@ -16,19 +14,19 @@ export function isSearchAvail() {
   }
 }
 
-const toLocation = ({
+const toVscodeLocation = ({
   file,
   line,
   lineEnd,
   column,
   columnEnd,
-}: Location): vscode.Location => {
-  return new vscode.Location(
+}: Location): vscode.Location =>
+  new vscode.Location(
     vscode.Uri.file(join(vscode.workspace.rootPath, file)),
     new vscode.Range(line, column, lineEnd, columnEnd)
   )
-}
 
+let ignoreNextSearch = false
 export async function NaiveGoToDefinition(
   document: vscode.TextDocument,
   pos: vscode.Position,
@@ -47,15 +45,10 @@ export async function NaiveGoToDefinition(
     >('vscode.executeDefinitionProvider', document.uri, pos)
     ignoreNextSearch = false
 
-    // debug
-    // return (await searchForDefinition(word, vscode.workspace.rootPath)).map(d =>
-    //   toLocation(d)
-    // )
-
     return otherProviderResults && otherProviderResults.length
       ? []
       : (await searchForDefinition(word, vscode.workspace.rootPath)).map(d =>
-          toLocation(d)
+          toVscodeLocation(d)
         )
   } catch (error) {
     console.error('[naive-definitions]', error)

@@ -19,23 +19,6 @@
   "categories": ["Languages"],
   "activationEvents": ["onLanguage:javascript", "onLanguage:javascriptreact"],
   "main": "./out/src/extension",
-  "contributes": {
-    "commands": [
-      {
-        "command": "editor.gotoNaiveDefinitions",
-        "title": "Go to Naive Definitions"
-      }
-    ],
-    "configuration": {
-      "properties": {
-        "naivedefinitions.integrateWithGoToDefinition": {
-          "type": "boolean",
-          "default": true,
-          "description": "Integrate with 'Go to Definition'"
-        }
-      }
-    }
-  },
   "scripts": {
     "test": "jest",
     "vscode:prepublish": "tsc -p ./",

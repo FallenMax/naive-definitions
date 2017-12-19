@@ -74,13 +74,16 @@ export async function searchForDefinition(word: string, directory: string) {
     `(var|let|const)[^=]+\\b${word}\\b`,
 
     // word =
-    `\\b${word}\\b[^=]*=[^=]`,
+    `\\b${word}\\b\\s*=[^=]+`,
 
     // function word (){}
     `\\bfunction\\b.*\\b${word}\\b`,
 
     // word: someValue
-    `\\b${word}\\b\s*:`,
+    `\\b${word}\\b\\s*:`,
+
+    // word () {    // es6 object-method
+    `^\\s*${word}\\s*\\([^\\)]+\\)\\s*\\{`,
   ]
 
   return Promise.race([

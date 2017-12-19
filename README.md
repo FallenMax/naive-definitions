@@ -1,31 +1,23 @@
-# Fuzzy Definitions
+# Naive Definitions
 
-A more graceful way to go to definition in JavaScript files. Will compute definitions by running
-a workspace symbol search and by running a textual query.
+_(Inspired by [Fuzzy Definitions](https://github.com/jrieken/fuzzy-definitions) and [Find All References](https://github.com/gayanhewa/vscode-find-all-references))_
 
-This is extension helps when types cannot be inferred by the JavaScript language service, for instance
-with angular service injections.
+Run (blazing fast) textual search to provide 'Go to Definitions' for JavaScript.
 
-![animation](./readme.gif)
+Helpful when navigating large JavaScript codebase (facepalm...).
 
-By default this extensions hooks up with the *Go to Definition* feature - which means its results
-are being merged with other providers. This can be configured using `fuzzydefinitions.integrateWithGoToDefinition`
-and fuzzy definitions can be invoked straight via `F1 > Go to Fuzzy Definitions`.
+## Requirement
+
+* Install [ripgrep](https://github.com/BurntSushi/ripgrep) and make it available in `$PATH` (run '`rg`' in commandline to verify)
+
+## How it works
+
+Hooks onto 'Go to Definitions' for JavaScript (and .jsx). If no reliable definitions can be inferred by built-in Intellisense engine, this extension will perform a workspace textual search with [ripgrep](https://github.com/BurntSushi/ripgrep), a blazing fast searching utility, to provide some 'likely-to-be' definitions.
+
+It respects `.gitignore`, and only looks at JavaScript (and .jsx) files.
 
 # Release Notes
 
-### 0.0.3
-
-* back to global nodejs
-* encode arguments such that it works on windows
-
-### 0.0.2
-
-* use the same nodejs version VS Code uses
-* kill fulltext search after 2 seconds
-* don't attempt to search `node_modules` folder
-
-
 ### 0.0.1
 
-* proof of concept
+* it now works
