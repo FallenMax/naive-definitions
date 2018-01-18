@@ -46,12 +46,7 @@ async function search({
     return locations
   }
   const command = [
-    'rg',
-    '--column',
-    '--color',
-    'never',
-    '--type',
-    'js',
+    'rg --column --color never --type js --type ts',
     ...patterns.map(p => ` -e '${p}'`),
   ].join(' ')
 
