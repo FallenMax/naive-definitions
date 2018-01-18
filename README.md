@@ -18,6 +18,10 @@ It respects `.gitignore`, and only looks at JavaScript (and .jsx) files.
 
 # Release Notes
 
+### 0.0.2
+
+* now also searches .ts/.tsx files for definitions
+
 ### 0.0.1
 
 * it now works

@@ -3,7 +3,7 @@
   "displayName": "Naive Definitions",
   "description": "Naive 'Go to Definition' for JavaScript",
   "license": "MIT",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "FallenMax",
   "repository": {
     "type": "git",
