@@ -12,7 +12,12 @@ export function activate(context: vscode.ExtensionContext) {
       )
     }
   } else {
-    const langs = ['javascript', 'javascriptreact']
+    const langs = [
+      'javascript',
+      'javascriptreact',
+      'typescript',
+      'typescriptreact',
+    ]
     context.subscriptions.push(
       ...langs.map(lang =>
         vscode.languages.registerDefinitionProvider(lang, {
