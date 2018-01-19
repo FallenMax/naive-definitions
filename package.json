@@ -3,7 +3,7 @@
   "displayName": "Naive Definitions",
   "description": "Naive 'Go to Definition' for JavaScript",
   "license": "MIT",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "FallenMax",
   "repository": {
     "type": "git",
@@ -17,7 +17,12 @@
     "vscode": "^1.0.0"
   },
   "categories": ["Languages"],
-  "activationEvents": ["onLanguage:javascript", "onLanguage:javascriptreact"],
+  "activationEvents": [
+    "onLanguage:javascript",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact"
+  ],
   "main": "./out/src/extension",
   "scripts": {
     "test": "jest",
