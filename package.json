@@ -3,7 +3,7 @@
   "displayName": "Naive Definitions",
   "description": "Naive 'Go to Definition' for JavaScript",
   "license": "MIT",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "publisher": "FallenMax",
   "repository": {
     "type": "git",
@@ -21,7 +21,8 @@
     "onLanguage:javascript",
     "onLanguage:javascriptreact",
     "onLanguage:typescript",
-    "onLanguage:typescriptreact"
+    "onLanguage:typescriptreact",
+    "onLanguage:vue"
   ],
   "main": "./out/src/extension",
   "scripts": {

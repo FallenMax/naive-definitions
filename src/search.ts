@@ -46,7 +46,7 @@ async function search({
     return locations
   }
   const command = [
-    'rg --column --color never --type js --type ts',
+    'rg --column --color never --type js --type ts --type-add vue:*.vue --type vue',
     ...patterns.map(p => ` -e '${p}'`),
   ].join(' ')
 
@@ -78,7 +78,7 @@ export async function searchForDefinition(word: string, directory: string) {
     `\\b${word}\\b\\s*:`,
 
     // word () {    // es6 object-method
-    `^\\s*${word}\\s*\\([^\\)]+\\)\\s*\\{`,
+    `^\\s*${word}\\s*\\([^\\)]*\\)\\s*\\{`,
   ]
 
   return Promise.race([

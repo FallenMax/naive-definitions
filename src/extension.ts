@@ -17,6 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
       'javascriptreact',
       'typescript',
       'typescriptreact',
+      'vue'
     ]
     context.subscriptions.push(
       ...langs.map(lang =>
