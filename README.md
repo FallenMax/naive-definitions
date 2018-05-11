@@ -12,11 +12,15 @@ Helpful when navigating large JavaScript codebase (facepalm...).
 
 ## How it works
 
-Hooks onto 'Go to Definitions' for JavaScript (and .jsx). If no reliable definitions can be inferred by built-in Intellisense engine, this extension will perform a workspace textual search with [ripgrep](https://github.com/BurntSushi/ripgrep), a blazing fast searching utility, to provide some 'likely-to-be' definitions.
+It hooks onto 'Go to Definitions' for JavaScript (and .jsx). If no reliable definitions can be inferred by built-in Intellisense engine, this extension will perform a workspace textual search using [ripgrep](https://github.com/BurntSushi/ripgrep), a searching utility, to provide some 'likely-to-be' definitions.
 
 It respects `.gitignore`, and only looks at JavaScript (and .jsx) files.
 
 # Release Notes
+
+### 0.0.5
+
+* now also searches .vue files for definitions
 
 ### 0.0.2
 

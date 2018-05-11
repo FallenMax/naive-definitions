@@ -1,6 +1,3 @@
-import { execSync } from 'child_process'
-import { error } from 'util'
-import { join } from 'path'
 import { run } from './util'
 
 export interface Location {
@@ -40,8 +37,12 @@ async function search({
       .sort(
         (a, b) =>
           a.file === b.file
-            ? a.line === b.line ? a.column - b.column : a.line - b.line
-            : a.file < b.file ? -1 : 1
+            ? a.line === b.line
+              ? a.column - b.column
+              : a.line - b.line
+            : a.file < b.file
+              ? -1
+              : 1
       )
     return locations
   }
@@ -50,7 +51,6 @@ async function search({
     ...patterns.map(p => ` -e '${p}'`),
   ].join(' ')
 
-  console.log('command ', command)
   const { stdout, stderr } = await run(command, {
     cwd: directory,
     timeout: 5000,
