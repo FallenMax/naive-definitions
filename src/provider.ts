@@ -22,7 +22,7 @@ const toVscodeLocation = ({
   columnEnd,
 }: Location): vscode.Location =>
   new vscode.Location(
-    vscode.Uri.file(join(vscode.workspace.rootPath, file)),
+    vscode.Uri.file(file),
     new vscode.Range(line, column, lineEnd, columnEnd)
   )
 

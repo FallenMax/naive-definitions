@@ -1,4 +1,5 @@
 import { run } from './util'
+import { RgOutput } from './types/rg_output'
 
 export interface Location {
   file: string
@@ -20,35 +21,38 @@ async function search({
     const locations = out
       .split('\n')
       .filter(Boolean)
+      .map(line => JSON.parse(line))
+      .filter(result => result.type && result.type === 'match')
       .map(match => {
-        const [file, line, column, ...rest] = match.split(':')
-        const lineStr = rest.join(':')
-        const lineNum = parseInt(line, 10) - 1
-        const columnNum = lineStr.search(new RegExp(`\\b${word}\\b`))
+        const {
+          path: { text: file },
+          line_number,
+          submatches: [{ start: column, end: columnEnd }],
+        } = (match as RgOutput).data
 
         return {
           file,
-          line: lineNum,
-          lineEnd: lineNum,
-          column: columnNum,
-          columnEnd: columnNum + word.length,
+          line: line_number - 1,
+          lineEnd: line_number - 1,
+          column,
+          columnEnd,
         }
       })
-      .sort(
-        (a, b) =>
-          a.file === b.file
-            ? a.line === b.line
-              ? a.column - b.column
-              : a.line - b.line
-            : a.file < b.file
-              ? -1
-              : 1
+      .sort((a, b) =>
+        a.file === b.file
+          ? a.line === b.line
+            ? a.column - b.column
+            : a.line - b.line
+          : a.file < b.file
+          ? -1
+          : 1
       )
     return locations
   }
   const command = [
-    'rg --column --color never --type js --type ts --type-add vue:*.vue --type vue',
-    ...patterns.map(p => ` -e '${p}'`),
+    'rg --json --column --color never --type js --type ts --type-add vue:*.vue --type vue',
+    ...patterns.map(p => ` -e "${p}"`),
+    `"${directory}"`,
   ].join(' ')
 
   const { stdout, stderr } = await run(command, {
