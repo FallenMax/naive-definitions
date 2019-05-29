@@ -1,15 +1,15 @@
 import * as vscode from 'vscode'
-import { NaiveGoToDefinition, isSearchAvail } from './provider'
+import { naiveProvideDefinition } from './provider'
+import { checkRg } from './util'
 
 let hasShownError = false
 
 export function activate(context: vscode.ExtensionContext) {
-  if (!isSearchAvail()) {
+  const error = checkRg()
+  if (error) {
     if (!hasShownError) {
       hasShownError = true
-      vscode.window.showErrorMessage(
-        `[naive-definitions] "ripgrep" is not found in $PATH, please refer to "naive-definitions" README.md`
-      )
+      vscode.window.showErrorMessage(`[naive-definitions] ${error}`)
     }
   } else {
     const langs = [
@@ -19,12 +19,11 @@ export function activate(context: vscode.ExtensionContext) {
       'typescriptreact',
       'vue',
     ]
-    context.subscriptions.push(
-      ...langs.map(lang =>
-        vscode.languages.registerDefinitionProvider(lang, {
-          provideDefinition: NaiveGoToDefinition,
-        })
-      )
+    const langProviders = langs.map(lang =>
+      vscode.languages.registerDefinitionProvider(lang, {
+        provideDefinition: naiveProvideDefinition,
+      })
     )
+    context.subscriptions.push(...langProviders)
   }
 }

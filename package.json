@@ -12,11 +12,15 @@
   "bugs": {
     "url": "https://github.com/fallenmax/naive-definitions/issues"
   },
-  "keywords": ["javascript"],
+  "keywords": [
+    "javascript"
+  ],
   "engines": {
     "vscode": "^1.0.0"
   },
-  "categories": ["Languages"],
+  "categories": [
+    "Languages"
+  ],
   "activationEvents": [
     "onLanguage:javascript",
     "onLanguage:javascriptreact",
@@ -27,25 +31,35 @@
   "main": "./out/src/extension",
   "scripts": {
     "test": "jest",
+    "test:watch": "jest --watch",
     "vscode:prepublish": "tsc -p ./",
     "compile": "tsc -watch -p ./",
     "postinstall": "node ./node_modules/vscode/bin/install"
   },
   "devDependencies": {
-    "@types/jest": "^21.1.8",
-    "@types/node": "^8.5.1",
-    "jest": "^21.2.1",
-    "ts-jest": "^21.2.4",
-    "typescript": "^2.6.2",
+    "@types/jest": "^24.0.13",
+    "@types/node": "^12.0.3",
+    "jest": "^24.8.0",
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.4.5",
     "vscode": "^1.1.10"
   },
   "dependencies": {},
   "jest": {
-    "moduleDirectories": ["node_modules"],
+    "moduleDirectories": [
+      "node_modules"
+    ],
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"]
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
   }
 }

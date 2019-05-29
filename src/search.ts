@@ -1,5 +1,5 @@
 import { run } from './util'
-import { RgOutput } from './types/rg_output'
+import { RgOutput } from './types/rg'
 
 export interface Location {
   file: string
@@ -24,18 +24,17 @@ async function search({
       .map(line => JSON.parse(line))
       .filter(result => result.type && result.type === 'match')
       .map(match => {
-        const {
-          path: { text: file },
-          line_number,
-          submatches: [{ start: column, end: columnEnd }],
-        } = (match as RgOutput).data
+        const data = (match as RgOutput).data
+        const lineText = data.lines.text
+        const start = lineText.indexOf(word)
+        const end = start + word.length
 
         return {
-          file,
-          line: line_number - 1,
-          lineEnd: line_number - 1,
-          column,
-          columnEnd,
+          file: data.path.text,
+          line: data.line_number - 1,
+          lineEnd: data.line_number - 1,
+          column: start,
+          columnEnd: end,
         }
       })
       .sort((a, b) =>
@@ -62,7 +61,10 @@ async function search({
   return stdout ? parse(stdout) : []
 }
 
-export async function searchForDefinition(word: string, directory: string) {
+export async function searchForDefinition(
+  word: string,
+  directory: string
+): Promise<Location[]> {
   const wait = (time: number) =>
     new Promise(resolve => setTimeout(resolve, time))
 
@@ -78,11 +80,12 @@ export async function searchForDefinition(word: string, directory: string) {
     // function word (){}
     `\\bfunction\\b.*\\b${word}\\b`,
 
-    // word: someValue
+    // key:value
     `\\b${word}\\b\\s*:`,
+    `^\\s*(async|public|private|protected)?\\s*${word}\\s*\\([^\\)]*\\)\\s*\\{`,
 
-    // word () {    // es6 object-method
-    `^\\s*${word}\\s*\\([^\\)]*\\)\\s*\\{`,
+    // class
+    `\\bclass ${word}\\b`,
   ]
 
   return Promise.race([
@@ -95,7 +98,6 @@ export async function searchForDefinition(word: string, directory: string) {
       directory,
     }),
   ]).catch(e => {
-    console.error('[naive-definitions]', e)
     return [] as Location[]
   })
 }
