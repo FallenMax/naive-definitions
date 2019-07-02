@@ -1,5 +1,5 @@
 'use strict'
-import { searchForDefinition, Location } from './search'
+import { searchForDefinition, Location, searchForReference } from './search'
 import * as vscode from 'vscode'
 
 const toVscodeLocation = ({
@@ -14,12 +14,12 @@ const toVscodeLocation = ({
     new vscode.Range(line, column, lineEnd, columnEnd)
   )
 
-let ignoreNextSearch = false
+let ignoreNextDefinitionSearch = false
 export async function naiveProvideDefinition(
   document: vscode.TextDocument,
   pos: vscode.Position
 ): Promise<vscode.Location[]> {
-  if (ignoreNextSearch) return []
+  if (ignoreNextDefinitionSearch) return []
 
   try {
     const range = document.getWordRangeAtPosition(pos)
@@ -27,11 +27,11 @@ export async function naiveProvideDefinition(
 
     const word = document.getText(range)
 
-    ignoreNextSearch = true
+    ignoreNextDefinitionSearch = true
     const otherProviderResults = await vscode.commands.executeCommand<
       vscode.Location[]
     >('vscode.executeDefinitionProvider', document.uri, pos)
-    ignoreNextSearch = false
+    ignoreNextDefinitionSearch = false
 
     if (otherProviderResults.length) {
       return []
@@ -44,7 +44,42 @@ export async function naiveProvideDefinition(
     return locations
   } catch (error) {
     console.error('[naive-definitions]', error)
-    ignoreNextSearch = false
+    ignoreNextDefinitionSearch = false
+    throw error
+  }
+}
+
+let ignoreNextReferenceSearch = false
+export async function naiveProvideReference(
+  document: vscode.TextDocument,
+  pos: vscode.Position
+): Promise<vscode.Location[]> {
+  if (ignoreNextReferenceSearch) return []
+
+  try {
+    const range = document.getWordRangeAtPosition(pos)
+    if (!range) return []
+
+    const word = document.getText(range)
+
+    ignoreNextReferenceSearch = true
+    const otherProviderResults = await vscode.commands.executeCommand<
+      vscode.Location[]
+    >('vscode.executeReferenceProvider', document.uri, pos)
+    ignoreNextReferenceSearch = false
+
+    if (otherProviderResults.length) {
+      return []
+    }
+
+    const locations = (await searchForReference(
+      word,
+      vscode.workspace.rootPath
+    )).map(d => toVscodeLocation(d))
+    return locations
+  } catch (error) {
+    console.error('[naive-definitions]', error)
+    ignoreNextReferenceSearch = false
     throw error
   }
 }

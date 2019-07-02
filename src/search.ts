@@ -101,3 +101,29 @@ export async function searchForDefinition(
     return [] as Location[]
   })
 }
+
+export async function searchForReference(
+  word: string,
+  directory: string
+): Promise<Location[]> {
+  const wait = (time: number) =>
+    new Promise(resolve => setTimeout(resolve, time))
+
+  const patterns = [
+    // word
+    `\\b${word}\\b`,
+  ]
+
+  return Promise.race([
+    wait(5000).then(e => {
+      throw new Error('ERR_RG_TIMEOUT')
+    }),
+    search({
+      word,
+      patterns,
+      directory,
+    }),
+  ]).catch(e => {
+    return [] as Location[]
+  })
+}

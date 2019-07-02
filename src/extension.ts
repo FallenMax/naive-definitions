@@ -1,5 +1,5 @@
 import * as vscode from 'vscode'
-import { naiveProvideDefinition } from './provider'
+import { naiveProvideDefinition, naiveProvideReference } from './provider'
 import { checkRg } from './util'
 
 let hasShownError = false
@@ -19,11 +19,16 @@ export function activate(context: vscode.ExtensionContext) {
       'typescriptreact',
       'vue',
     ]
-    const langProviders = langs.map(lang =>
+    const defProviders = langs.map(lang =>
       vscode.languages.registerDefinitionProvider(lang, {
         provideDefinition: naiveProvideDefinition,
       })
     )
-    context.subscriptions.push(...langProviders)
+    const refProviders = langs.map(lang =>
+      vscode.languages.registerReferenceProvider(lang, {
+        provideReferences: naiveProvideReference,
+      })
+    )
+    context.subscriptions.push(...[].concat(defProviders, refProviders))
   }
 }
