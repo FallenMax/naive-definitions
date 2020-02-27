@@ -21,3 +21,11 @@ export function checkRg(): string | undefined {
     return '`rg` (ripgrep) is not found in $PATH, please refer to "naive-definitions" README.md'
   }
 }
+
+const isDebugging = false
+
+export function log(...args: any[]) {
+  if (isDebugging) {
+    console.info.apply(console, args)
+  }
+}

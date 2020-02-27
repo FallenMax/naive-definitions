@@ -6,8 +6,9 @@ const file1 = path.join(inputPath, 'file1.js')
 const file2 = path.join(inputPath, 'file2.js')
 const file4 = path.join(inputPath, 'subfolder/file4.js')
 
-const find = word => searchForDefinition(word, inputPath)
+const find = (word) => searchForDefinition(word, inputPath)
 
+/** position */
 const p = (file, line, col, colEnd) => {
   return { column: col, columnEnd: colEnd, file, line, lineEnd: line }
 }
@@ -39,4 +40,8 @@ test('class', async () => {
   expect(await find('a20')).toEqual([p(file1, 26, 2, 5)])
   expect(await find('a21')).toEqual([p(file1, 27, 2, 5)])
   expect(await find('a22')).toEqual([p(file1, 28, 10, 13)])
+})
+
+test('property assign', async () => {
+  expect(await find('a23')).toEqual([p(file1, 36, 10, 13)])
 })

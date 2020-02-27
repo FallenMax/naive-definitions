@@ -1,7 +1,7 @@
 {
   "name": "naive-definitions",
   "displayName": "Naive Definitions",
-  "description": "Naive 'Go to Definition' for JavaScript",
+  "description": "Best-effort 'Go to Definition' for JavaScript",
   "license": "MIT",
   "version": "0.0.7",
   "publisher": "FallenMax",

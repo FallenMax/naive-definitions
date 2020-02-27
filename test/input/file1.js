@@ -32,3 +32,6 @@ class a18 extends a19 {
 a1
 a2
 a13
+
+// property assign
+someProto.a23 = () =>{}

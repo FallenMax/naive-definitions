@@ -1,4 +1,4 @@
-import { run } from './util'
+import { run, log } from './util'
 import { RgOutput } from './types/rg'
 
 export interface Location {
@@ -17,26 +17,41 @@ async function search({
   patterns: string[]
   directory: string
 }): Promise<Location[]> {
+  log('search: ', word)
   const parse = (out: string) => {
     const locations = out
       .split('\n')
       .filter(Boolean)
-      .map((line) => JSON.parse(line))
-      .filter((result) => result.type && result.type === 'match')
+      /**
+       * output:
+       *
+       * /Users/fallenmax/code/github/naive-definitions/test/input/file2.js:1:1:var a1
+       */
       .map((match) => {
-        const data = (match as RgOutput).data
-        const lineText = data.lines.text
-        const start = lineText.indexOf(word)
-        const end = start + word.length
-
-        return {
-          file: data.path.text,
-          line: data.line_number - 1,
-          lineEnd: data.line_number - 1,
-          column: start,
-          columnEnd: end,
+        const [
+          _,
+          file,
+          line,
+          _col,
+          content,
+        ] = /^([^:]*):(\d+):(\d+):(.*)$/.exec(match)!
+        const col = content.indexOf(word)
+        if (col === -1) {
+          // for '[Omitted long line with 1 matches]'
+          return undefined
         }
+
+        const found = {
+          file,
+          line: Number(line) - 1,
+          lineEnd: Number(line) - 1,
+          column: col,
+          columnEnd: col + word.length,
+        }
+
+        return found
       })
+      .filter(Boolean)
       .sort((a, b) =>
         a.file === b.file
           ? a.line === b.line
@@ -49,16 +64,25 @@ async function search({
     return locations
   }
   const command = [
-    'rg --json --column --color never --type js --type ts --type-add vue:*.vue --type vue',
+    'rg',
+    '--column',
+    '--color never',
+    '--type js --type ts --type-add "vue:*.vue" --type vue',
+    '--max-columns 1024', // omit *.min.js results
+    `--max-filesize 1M`, // omit bundled js
     ...patterns.map((p) => ` -e "${p}"`),
     `"${directory}"`,
   ].join(' ')
-
+  log('->', command)
   const { stdout, stderr } = await run(command, {
     cwd: directory,
     timeout: 5000,
+    maxBuffer: 1024 * 1024 * 10, // 10M
   })
-  return stdout ? parse(stdout) : []
+  log('<-', stdout, stderr)
+  const results = stdout ? parse(stdout) : []
+  log('results: ', results)
+  return results
 }
 
 export async function searchForDefinition(
@@ -75,6 +99,7 @@ export async function searchForDefinition(
     `(var|let|const)[^=]+\\b${word}\\b`,
 
     // word =
+    // obj.word =
     `\\b${word}\\b\\s*=[^=]+`,
 
     // function word (){}
@@ -98,6 +123,7 @@ export async function searchForDefinition(
       directory,
     }),
   ]).catch((e) => {
+    console.error(e)
     return [] as Location[]
   })
 }
@@ -116,7 +142,7 @@ export async function searchForReference(
 
   return Promise.race([
     wait(5000).then((e) => {
-      throw new Error('ERR_RG_TIMEOUT')
+      throw new Error('ERR_TIMEOUT')
     }),
     search({
       word,
@@ -124,6 +150,7 @@ export async function searchForReference(
       directory,
     }),
   ]).catch((e) => {
+    console.error(e)
     return [] as Location[]
   })
 }
