@@ -3,8 +3,8 @@ import { exec, ExecOptions, execSync } from 'child_process'
 export const run = async (command: string, options: ExecOptions = {}) =>
   new Promise<{ stdout: string; stderr: string }>((resolve, reject) =>
     exec(command, options, (error, stdout, stderr) =>
-      error ? reject(error) : resolve({ stdout, stderr })
-    )
+      error ? reject(error) : resolve({ stdout, stderr }),
+    ),
   )
 
 export function checkRg(): string | undefined {
@@ -13,7 +13,7 @@ export function checkRg(): string | undefined {
     if (rg !== 'ripgrep') {
       throw new Error('not found')
     }
-    const [major, minor] = version.split('.').map(s => Number(s))
+    const [major, minor] = version.split('.').map((s) => Number(s))
     if (major === 0 && minor < 10) {
       return 'Require `rg` has version >= 0.10.0, instead it is ' + version
     }

@@ -21,9 +21,9 @@ async function search({
     const locations = out
       .split('\n')
       .filter(Boolean)
-      .map(line => JSON.parse(line))
-      .filter(result => result.type && result.type === 'match')
-      .map(match => {
+      .map((line) => JSON.parse(line))
+      .filter((result) => result.type && result.type === 'match')
+      .map((match) => {
         const data = (match as RgOutput).data
         const lineText = data.lines.text
         const start = lineText.indexOf(word)
@@ -44,13 +44,13 @@ async function search({
             : a.line - b.line
           : a.file < b.file
           ? -1
-          : 1
+          : 1,
       )
     return locations
   }
   const command = [
     'rg --json --column --color never --type js --type ts --type-add vue:*.vue --type vue',
-    ...patterns.map(p => ` -e "${p}"`),
+    ...patterns.map((p) => ` -e "${p}"`),
     `"${directory}"`,
   ].join(' ')
 
@@ -63,10 +63,10 @@ async function search({
 
 export async function searchForDefinition(
   word: string,
-  directory: string
+  directory: string,
 ): Promise<Location[]> {
   const wait = (time: number) =>
-    new Promise(resolve => setTimeout(resolve, time))
+    new Promise((resolve) => setTimeout(resolve, time))
 
   const patterns = [
     // var word
@@ -89,25 +89,25 @@ export async function searchForDefinition(
   ]
 
   return Promise.race([
-    wait(5000).then(e => {
-      throw new Error('ERR_RG_TIMEOUT')
+    wait(5000).then((e) => {
+      throw new Error('ERR_TIMEOUT')
     }),
     search({
       word,
       patterns,
       directory,
     }),
-  ]).catch(e => {
+  ]).catch((e) => {
     return [] as Location[]
   })
 }
 
 export async function searchForReference(
   word: string,
-  directory: string
+  directory: string,
 ): Promise<Location[]> {
   const wait = (time: number) =>
-    new Promise(resolve => setTimeout(resolve, time))
+    new Promise((resolve) => setTimeout(resolve, time))
 
   const patterns = [
     // word
@@ -115,7 +115,7 @@ export async function searchForReference(
   ]
 
   return Promise.race([
-    wait(5000).then(e => {
+    wait(5000).then((e) => {
       throw new Error('ERR_RG_TIMEOUT')
     }),
     search({
@@ -123,7 +123,7 @@ export async function searchForReference(
       patterns,
       directory,
     }),
-  ]).catch(e => {
+  ]).catch((e) => {
     return [] as Location[]
   })
 }

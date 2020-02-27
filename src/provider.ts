@@ -11,13 +11,13 @@ const toVscodeLocation = ({
 }: Location): vscode.Location =>
   new vscode.Location(
     vscode.Uri.file(file),
-    new vscode.Range(line, column, lineEnd, columnEnd)
+    new vscode.Range(line, column, lineEnd, columnEnd),
   )
 
 let ignoreNextDefinitionSearch = false
 export async function naiveProvideDefinition(
   document: vscode.TextDocument,
-  pos: vscode.Position
+  pos: vscode.Position,
 ): Promise<vscode.Location[]> {
   if (ignoreNextDefinitionSearch) return []
 
@@ -37,10 +37,9 @@ export async function naiveProvideDefinition(
       return []
     }
 
-    const locations = (await searchForDefinition(
-      word,
-      vscode.workspace.rootPath
-    )).map(d => toVscodeLocation(d))
+    const locations = (
+      await searchForDefinition(word, vscode.workspace.rootPath)
+    ).map((d) => toVscodeLocation(d))
     return locations
   } catch (error) {
     console.error('[naive-definitions]', error)
@@ -52,7 +51,7 @@ export async function naiveProvideDefinition(
 let ignoreNextReferenceSearch = false
 export async function naiveProvideReference(
   document: vscode.TextDocument,
-  pos: vscode.Position
+  pos: vscode.Position,
 ): Promise<vscode.Location[]> {
   if (ignoreNextReferenceSearch) return []
 
@@ -72,10 +71,9 @@ export async function naiveProvideReference(
       return []
     }
 
-    const locations = (await searchForReference(
-      word,
-      vscode.workspace.rootPath
-    )).map(d => toVscodeLocation(d))
+    const locations = (
+      await searchForReference(word, vscode.workspace.rootPath)
+    ).map((d) => toVscodeLocation(d))
     return locations
   } catch (error) {
     console.error('[naive-definitions]', error)

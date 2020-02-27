@@ -19,15 +19,15 @@ export function activate(context: vscode.ExtensionContext) {
       'typescriptreact',
       'vue',
     ]
-    const defProviders = langs.map(lang =>
+    const defProviders = langs.map((lang) =>
       vscode.languages.registerDefinitionProvider(lang, {
         provideDefinition: naiveProvideDefinition,
-      })
+      }),
     )
-    const refProviders = langs.map(lang =>
+    const refProviders = langs.map((lang) =>
       vscode.languages.registerReferenceProvider(lang, {
         provideReferences: naiveProvideReference,
-      })
+      }),
     )
     context.subscriptions.push(...[].concat(defProviders, refProviders))
   }
