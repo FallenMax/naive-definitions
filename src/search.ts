@@ -28,7 +28,7 @@ async function search({
        */
       .map((match) => {
         const [_, file, line, _col, content] =
-          /^([^:]*):(\d+):(\d+):([\s\S]*)$/.exec(match) || []
+          /^([\s\S]*):(\d+):(\d+):([\s\S]*)$/.exec(match) || []
         const col = content.indexOf(word)
         if (col === -1) {
           // for '[Omitted long line with 1 matches]'
