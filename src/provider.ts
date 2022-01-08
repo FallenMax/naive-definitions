@@ -1,6 +1,6 @@
 'use strict'
-import { searchForDefinition, Location, searchForReference } from './search'
 import * as vscode from 'vscode'
+import { Location, searchForDefinition, searchForReference } from './search'
 
 const toVscodeLocation = ({
   file,

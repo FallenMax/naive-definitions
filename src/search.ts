@@ -1,5 +1,4 @@
-import { run, log } from './util'
-import { RgOutput } from './types/rg'
+import { log, run } from './util'
 
 export interface Location {
   file: string
@@ -28,13 +27,8 @@ async function search({
        * /Users/fallenmax/code/github/naive-definitions/test/input/file2.js:1:1:var a1
        */
       .map((match) => {
-        const [
-          _,
-          file,
-          line,
-          _col,
-          content,
-        ] = /^([^:]*):(\d+):(\d+):(.*)$/.exec(match)!
+        const [_, file, line, _col, content] =
+          /^([^:]*):(\d+):(\d+):([\s\S]*)$/.exec(match) || []
         const col = content.indexOf(word)
         if (col === -1) {
           // for '[Omitted long line with 1 matches]'
