@@ -45,3 +45,7 @@ test('class', async () => {
 test('property assign', async () => {
   expect(await find('a23')).toEqual([p(file1, 36, 10, 13)])
 })
+
+test('handle spacestabs', async () => {
+  expect(await find('a24')).toEqual([p(file1, 39, 8, 11)])
+})

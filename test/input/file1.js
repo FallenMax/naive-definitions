@@ -35,3 +35,6 @@ a13
 
 // property assign
 someProto.a23 = () =>{}
+
+// handle leading spaces/tab
+	   var a24 = 0
