@@ -29,6 +29,9 @@ async function search({
       .map((match) => {
         const [_, file, line, _col, content] =
           /^([\s\S]*):(\d+):(\d+):([\s\S]*)$/.exec(match) || []
+
+        if (!content) return undefined
+
         const col = content.indexOf(word)
         if (col === -1) {
           // for '[Omitted long line with 1 matches]'
@@ -61,7 +64,7 @@ async function search({
     'rg',
     '--column',
     '--color never',
-    '--type js --type ts --type-add "vue:*.vue" --type vue',
+    '--type js --type ts --type-add "vue:*.vue" --type vue', // search in js, ts, vue
     '--max-columns 1024', // omit *.min.js results
     `--max-filesize 1M`, // omit bundled js
     ...patterns.map((p) => ` -e "${p}"`),
@@ -97,6 +100,8 @@ export async function searchForDefinition(
     `\\b${word}\\b\\s*=[^=]+`,
 
     // function word (){}
+    // function* word (){}
+    // function<T> word (){}
     `\\bfunction\\b.*\\b${word}\\b`,
 
     // key:value
