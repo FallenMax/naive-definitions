@@ -1,11 +1,16 @@
 import { exec, ExecOptions, execSync } from 'child_process'
 
-export const run = async (command: string, options: ExecOptions = {}) =>
-  new Promise<{ stdout: string; stderr: string }>((resolve, reject) =>
-    exec(command, options, (error, stdout, stderr) =>
-      error ? reject(error) : resolve({ stdout, stderr }),
-    ),
-  )
+export const run = async (command: string, options: ExecOptions = {}) => {
+  return new Promise<{ stdout: string; stderr: string }>((resolve, reject) => {
+    exec(command, options, (error, stdout, stderr) => {
+      if (error) {
+        reject(error)
+      } else {
+        resolve({ stdout, stderr })
+      }
+    })
+  })
+}
 
 export function checkRg(): string | undefined {
   try {
@@ -29,3 +34,6 @@ export function log(...args: any[]) {
     console.info.apply(console, args)
   }
 }
+
+export const wait = (time: number) =>
+  new Promise((resolve) => setTimeout(resolve, time))

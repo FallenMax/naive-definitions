@@ -7,149 +7,85 @@ export interface Location {
   column: number
   columnEnd: number
 }
-async function search({
+const parse = (out: string, word: string) => {
+  const locations = out
+    .split('\n')
+    .filter(Boolean)
+    /**
+     * output:
+     *
+     * /Users/fallenmax/code/github/naive-definitions/test/input/file2.js:1:1:var a1
+     */
+    .map((match) => {
+      const [_, file, line, _col, content] =
+        /^([\s\S]*):(\d+):(\d+):([\s\S]*)$/.exec(match) || []
+
+      if (!content) return undefined
+
+      const col = content.indexOf(word)
+      if (col === -1) {
+        // for '[Omitted long line with 1 matches]'
+        return undefined
+      }
+
+      const found = {
+        file,
+        line: Number(line) - 1,
+        lineEnd: Number(line) - 1,
+        column: col,
+        columnEnd: col + word.length,
+      }
+
+      return found
+    })
+    .filter(Boolean)
+    .sort((a, b) =>
+      a.file === b.file
+        ? a.line === b.line
+          ? a.column - b.column
+          : a.line - b.line
+        : a.file < b.file
+        ? -1
+        : 1,
+    )
+  return locations
+}
+
+export async function search({
   word,
   patterns,
   directory,
+  fileGlobs,
 }: {
   word: string
   patterns: string[]
   directory: string
+  fileGlobs: string[]
 }): Promise<Location[]> {
-  log('search: ', word)
-  const parse = (out: string) => {
-    const locations = out
-      .split('\n')
-      .filter(Boolean)
-      /**
-       * output:
-       *
-       * /Users/fallenmax/code/github/naive-definitions/test/input/file2.js:1:1:var a1
-       */
-      .map((match) => {
-        const [_, file, line, _col, content] =
-          /^([\s\S]*):(\d+):(\d+):([\s\S]*)$/.exec(match) || []
-
-        if (!content) return undefined
-
-        const col = content.indexOf(word)
-        if (col === -1) {
-          // for '[Omitted long line with 1 matches]'
-          return undefined
-        }
-
-        const found = {
-          file,
-          line: Number(line) - 1,
-          lineEnd: Number(line) - 1,
-          column: col,
-          columnEnd: col + word.length,
-        }
-
-        return found
-      })
-      .filter(Boolean)
-      .sort((a, b) =>
-        a.file === b.file
-          ? a.line === b.line
-            ? a.column - b.column
-            : a.line - b.line
-          : a.file < b.file
-          ? -1
-          : 1,
-      )
-    return locations
+  try {
+    log('search: ', word)
+    const command = [
+      'rg',
+      '--column',
+      '--color never',
+      '--max-columns 1024', // omit *.min.js results
+      `--max-filesize 1M`, // omit bundled js
+      ...patterns.map((p) => `-e "${p.replace('%s', word)}"`),
+      ...fileGlobs.map((p) => `--glob "${p}"`),
+      `"${directory}"`,
+    ].join(' ')
+    log('->', command)
+    const { stdout, stderr } = await run(command, {
+      cwd: directory,
+      timeout: 5000,
+      maxBuffer: 1024 * 1024 * 10, // 10M
+    })
+    log('<-', stdout, stderr)
+    const results = stdout ? parse(stdout, word) : []
+    log('results: ', results)
+    return results
+  } catch (error) {
+    console.error('[naive-definitions] search error:', error)
+    throw error
   }
-  const command = [
-    'rg',
-    '--column',
-    '--color never',
-    '--type js --type ts --type-add "vue:*.vue" --type vue', // search in js, ts, vue
-    '--max-columns 1024', // omit *.min.js results
-    `--max-filesize 1M`, // omit bundled js
-    ...patterns.map((p) => ` -e "${p}"`),
-    `"${directory}"`,
-  ].join(' ')
-  log('->', command)
-  const { stdout, stderr } = await run(command, {
-    cwd: directory,
-    timeout: 5000,
-    maxBuffer: 1024 * 1024 * 10, // 10M
-  })
-  log('<-', stdout, stderr)
-  const results = stdout ? parse(stdout) : []
-  log('results: ', results)
-  return results
-}
-
-export async function searchForDefinition(
-  word: string,
-  directory: string,
-): Promise<Location[]> {
-  const wait = (time: number) =>
-    new Promise((resolve) => setTimeout(resolve, time))
-
-  const patterns = [
-    // var word
-    // let word
-    // const word
-    `(var|let|const)[^=]+\\b${word}\\b`,
-
-    // word =
-    // obj.word =
-    `\\b${word}\\b\\s*=[^=]+`,
-
-    // function word (){}
-    // function* word (){}
-    // function<T> word (){}
-    `\\bfunction\\b.*\\b${word}\\b`,
-
-    // key:value
-    `\\b${word}\\b\\s*:`,
-    `^\\s*(async|public|private|protected)?\\s*${word}\\s*\\([^\\)]*\\)\\s*\\{`,
-
-    // class
-    `\\bclass ${word}\\b`,
-  ]
-
-  return Promise.race([
-    wait(5000).then((e) => {
-      throw new Error('ERR_TIMEOUT')
-    }),
-    search({
-      word,
-      patterns,
-      directory,
-    }),
-  ]).catch((e) => {
-    console.error(e)
-    return [] as Location[]
-  })
-}
-
-export async function searchForReference(
-  word: string,
-  directory: string,
-): Promise<Location[]> {
-  const wait = (time: number) =>
-    new Promise((resolve) => setTimeout(resolve, time))
-
-  const patterns = [
-    // word
-    `\\b${word}\\b`,
-  ]
-
-  return Promise.race([
-    wait(5000).then((e) => {
-      throw new Error('ERR_TIMEOUT')
-    }),
-    search({
-      word,
-      patterns,
-      directory,
-    }),
-  ]).catch((e) => {
-    console.error(e)
-    return [] as Location[]
-  })
 }

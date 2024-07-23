@@ -1,12 +1,26 @@
-const { searchForDefinition } = require('../src/search')
-const path = require('path')
+import { search } from '../src/search'
+import path from 'path'
+import { expect, test } from 'vitest'
 
-const inputPath = path.resolve(__dirname, '../test/input')
-const file1 = path.join(inputPath, 'file1.js')
-const file2 = path.join(inputPath, 'file2.js')
-const file4 = path.join(inputPath, 'subfolder/file4.js')
+const directory = path.resolve(__dirname, '../test/input')
+const file1 = path.join(directory, 'file1.js')
+const file2 = path.join(directory, 'file2.js')
+const file4 = path.join(directory, 'subfolder/file4.js')
 
-const find = (word) => searchForDefinition(word, inputPath)
+const find = (word) =>
+  search({
+    word,
+    directory,
+    patterns: [
+      '(var|let|const)[^=]+\\b%s\\b',
+      '\\b%s\\b\\s*=[^=]+',
+      '\\bfunction\\b.*\\b%s\\b',
+      '\\b%s\\b\\s*:',
+      '^\\s*(async|public|private|protected)?\\s*%s\\s*\\([^\\)]*\\)\\s*\\{',
+      '\\bclass\\b.*\\b%s\\b',
+    ],
+    fileGlobs: ['**/*.js'],
+  })
 
 /** position */
 const p = (file, line, col, colEnd) => {

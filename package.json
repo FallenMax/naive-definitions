@@ -1,9 +1,9 @@
 {
   "name": "naive-definitions",
   "displayName": "Naive Definitions",
-  "description": "Best-effort 'Go to Definition' for JavaScript",
+  "description": "Best-effort 'Go to Definition' and 'Find Reference'",
   "license": "MIT",
-  "version": "0.0.11",
+  "version": "0.1.0",
   "publisher": "FallenMax",
   "repository": {
     "type": "git",
@@ -13,7 +13,13 @@
     "url": "https://github.com/fallenmax/naive-definitions/issues"
   },
   "keywords": [
-    "javascript"
+    "navigation",
+    "lsp",
+    "definition",
+    "reference",
+    "find",
+    "fuzzy",
+    "search"
   ],
   "engines": {
     "vscode": "^1.0.0"
@@ -22,44 +28,62 @@
     "Programming Languages"
   ],
   "activationEvents": [
-    "onLanguage:javascript",
-    "onLanguage:javascriptreact",
-    "onLanguage:typescript",
-    "onLanguage:typescriptreact",
-    "onLanguage:vue"
+    "onStartupFinished"
   ],
+  "contributes": {
+    "configuration": {
+      "title": "Naive Definitions",
+      "properties": {
+        "naiveDefinitions.languageConfigs": {
+          "type": "array",
+          "markdownDescription": "The configuration for each programming language. \nSee https://github.com/fallenmax/naive-definitions/blob/main/README.md#configuration for more details.",
+          "default": [
+            {
+              "languages": [
+                "javascript",
+                "javascriptreact",
+                "typescript",
+                "typescriptreact",
+                "vue"
+              ],
+              "definitionPatterns": [
+                "(var|let|const)[^=]+\\b%s\\b",
+                "\\b%s\\b\\s*=[^=]+",
+                "\\bfunction\\b.*\\b%s\\b",
+                "\\b%s\\b\\s*:",
+                "^\\s*(async|public|private|protected)?\\s*%s\\s*\\([^\\)]*\\)\\s*\\{",
+                "\\bclass\\b.*\\b%s\\b"
+              ],
+              "referencePatterns": [
+                "\\b%s\\b"
+              ],
+              "fileGlobs": [
+                "**/*.js",
+                "**/*.jsx",
+                "**/*.ts",
+                "**/*.tsx",
+                "**/*.vue"
+              ]
+            }
+          ],
+          "description": "The configuration for each programming language."
+        }
+      }
+    }
+  },
   "main": "./out/src/extension",
   "scripts": {
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "vscode:prepublish": "tsc -p ./ && npm run test",
+    "test": "vitest --run",
+    "test:watch": "vitest --watch",
+    "vscode:prepublish": "tsc -p ./ && pnpm run test",
     "compile": "tsc -watch -p ./",
     "postinstall": "node ./node_modules/vscode/bin/install"
   },
   "devDependencies": {
-    "@types/jest": "^27.4.0",
-    "@types/node": "^17.0.8",
-    "jest": "^27.4.7",
-    "ts-jest": "^27.1.2",
-    "typescript": "^4.5.4",
-    "vscode": "^1.1.37"
+    "@types/node": "^20.14.11",
+    "typescript": "^5.5.4",
+    "vscode": "^1.1.37",
+    "vitest": "^2.0.4"
   },
-  "dependencies": {},
-  "jest": {
-    "moduleDirectories": [
-      "node_modules"
-    ],
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
-    ]
-  }
+  "dependencies": {}
 }
