@@ -1,21 +1,22 @@
 import * as vscode from 'vscode'
-import { checkRg } from './util'
-import { LanguageConfigs } from './types/config'
 import { Location, search } from './search'
+import { LanguageConfigs } from './types/config'
+import { checkRg } from './util'
 
 let hasShownError = false
 
-const toVscodeLocation = ({
+function toVscodeLocation({
   file,
   line,
   lineEnd,
   column,
   columnEnd,
-}: Location): vscode.Location =>
-  new vscode.Location(
+}: Location): vscode.Location {
+  return new vscode.Location(
     vscode.Uri.file(file),
     new vscode.Range(line, column, lineEnd, columnEnd),
   )
+}
 
 export function activate(context: vscode.ExtensionContext) {
   const error = checkRg()
@@ -36,7 +37,8 @@ export function activate(context: vscode.ExtensionContext) {
           const range = document.getWordRangeAtPosition(pos)
           if (!range) return []
 
-          const word = document.getText(range)
+          let word = document.getText(range)
+          word = removeSymbols(word)
           if (!word) return []
 
           const directory = vscode.workspace.rootPath || ''
@@ -55,7 +57,8 @@ export function activate(context: vscode.ExtensionContext) {
           const range = document.getWordRangeAtPosition(pos)
           if (!range) return []
 
-          const word = document.getText(range)
+          let word = document.getText(range)
+          word = removeSymbols(word)
           if (!word) return []
 
           const directory = vscode.workspace.rootPath || ''
@@ -72,4 +75,8 @@ export function activate(context: vscode.ExtensionContext) {
       }),
     )
   }
+}
+
+function removeSymbols(word: string) {
+  return word.replace(/[^\w\s]/g, '')
 }
