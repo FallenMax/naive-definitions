@@ -1,6 +1,5 @@
 .vscode/**
 typings/**
-out/test/**
 test/**
 src/**
 **/*.map
@@ -8,3 +7,4 @@ src/**
 tsconfig.json
 vsc-extension-quickstart.md
 pnpm-lock.yaml
+node_modules/**

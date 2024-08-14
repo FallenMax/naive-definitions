@@ -1,3 +1,4 @@
+import * as path from 'path'
 import { log, run } from './util'
 
 export interface Location {
@@ -56,11 +57,13 @@ export async function search({
   patterns,
   directory,
   fileGlobs,
+  fromFile,
 }: {
   word: string
   patterns: string[]
   directory: string
   fileGlobs: string[]
+  fromFile?: string
 }): Promise<Location[]> {
   try {
     log('search: ', word)
@@ -74,18 +77,36 @@ export async function search({
       ...fileGlobs.map((p) => `--glob "${p}"`),
       `"${directory}"`,
     ].join(' ')
-    log('->', command)
     const { stdout, stderr } = await run(command, {
       cwd: directory,
       timeout: 5000,
       maxBuffer: 1024 * 1024 * 10, // 10M
     })
     log('<-', stdout, stderr)
-    const results = stdout ? parse(stdout, word) : []
+    let results = stdout ? parse(stdout, word) : []
     log('results: ', results)
+
+    // Sort results based on nearness to fromFile
+    if (fromFile) {
+      results.sort((a, b) => {
+        const scoreA = computeNearnessScore(fromFile, a.file)
+        const scoreB = computeNearnessScore(fromFile, b.file)
+        return scoreA - scoreB
+      })
+    }
+
     return results
   } catch (error) {
     console.error('[naive-definitions] search error:', error)
     throw error
   }
+}
+
+/**
+ * Compute the nearness score of two files, the lower the score, the closer the files are
+ */
+const computeNearnessScore = (fromFile: string, toFile: string): number => {
+  if (fromFile === toFile) return 0
+  const relativePath = path.relative(path.dirname(fromFile), toFile)
+  return relativePath.split(path.sep).length
 }

@@ -3,8 +3,6 @@ import { Location, search } from './search'
 import { LanguageConfigs } from './types/config'
 import { checkRg } from './util'
 
-let hasShownError = false
-
 function toVscodeLocation({
   file,
   line,
@@ -18,22 +16,31 @@ function toVscodeLocation({
   )
 }
 
-export function activate(context: vscode.ExtensionContext) {
-  const error = checkRg()
-  if (error) {
-    if (!hasShownError) {
-      hasShownError = true
+let rgAvailable: boolean | undefined
+const ensureRg = async () => {
+  if (rgAvailable == null) {
+    const error = checkRg()
+    if (error) {
       vscode.window.showErrorMessage(`[naive-definitions] ${error}`)
+      rgAvailable = false
+    } else {
+      rgAvailable = true
     }
-    return
   }
 
+  if (!rgAvailable) {
+    throw new Error('[naive-definitions] rg is not available')
+  }
+}
+
+export function activate(context: vscode.ExtensionContext) {
   const config = vscode.workspace.getConfiguration('naiveDefinitions')
   const languageConfigs = config.get<LanguageConfigs>('languageConfigs')
   for (const config of languageConfigs) {
     context.subscriptions.push(
       vscode.languages.registerDefinitionProvider(config.languages, {
         provideDefinition: async (document, pos, token) => {
+          await ensureRg()
           const range = document.getWordRangeAtPosition(pos)
           if (!range) return []
 
@@ -47,13 +54,20 @@ export function activate(context: vscode.ExtensionContext) {
           )
           const fileGlobs = config.fileGlobs
           const locations = (
-            await search({ word, patterns, directory, fileGlobs })
+            await search({
+              word,
+              patterns,
+              directory,
+              fileGlobs,
+              fromFile: document.uri.fsPath,
+            })
           ).map(toVscodeLocation)
           return locations
         },
       }),
       vscode.languages.registerReferenceProvider(config.languages, {
         provideReferences: async (document, pos) => {
+          await ensureRg()
           const range = document.getWordRangeAtPosition(pos)
           if (!range) return []
 
@@ -68,7 +82,13 @@ export function activate(context: vscode.ExtensionContext) {
           )
           const fileGlobs = config.fileGlobs
           const locations = (
-            await search({ word, patterns, directory, fileGlobs })
+            await search({
+              word,
+              patterns,
+              directory,
+              fileGlobs,
+              fromFile: document.uri.fsPath,
+            })
           ).map(toVscodeLocation)
           return locations
         },
