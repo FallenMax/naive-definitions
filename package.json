@@ -82,7 +82,9 @@
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "vscode:prepublish": "pnpm run build",
     "build": "pnpm run check-types && node esbuild.js --production",
-    "package": "vsce package -o dist/naive-definition.vsix"
+    "package": "vsce package -o dist/naive-definition.vsix",
+    "deploy:code": "pnpm package && code --install-extension dist/naive-definition.vsix --force",
+    "deploy:cursor": "pnpm package && cursor --install-extension dist/naive-definition.vsix --force"
   },
   "devDependencies": {
     "@types/node": "^22.3.0",
