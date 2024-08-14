@@ -80,8 +80,9 @@
     "watch": "npm-run-all -p watch:*",
     "watch:esbuild": "node esbuild.js --watch",
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
-    "vscode:prepublish": "pnpm run package",
-    "package": "pnpm run check-types && node esbuild.js --production"
+    "vscode:prepublish": "pnpm run build",
+    "build": "pnpm run check-types && node esbuild.js --production",
+    "package": "vsce package -o dist/naive-definition.vsix"
   },
   "devDependencies": {
     "@types/node": "^22.3.0",
