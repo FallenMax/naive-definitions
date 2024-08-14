@@ -3,7 +3,7 @@
   "displayName": "Naive Definitions",
   "description": "Best-effort 'Go to Definition' and 'Find Reference'",
   "license": "MIT",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publisher": "FallenMax",
   "repository": {
     "type": "git",
