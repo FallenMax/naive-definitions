@@ -4,7 +4,12 @@ test/**
 src/**
 **/*.map
 .gitignore
+.prettierignore
+.prettierrc.js
+.eslintrc.js
+esbuild.js
 tsconfig.json
 vsc-extension-quickstart.md
 pnpm-lock.yaml
+pnpm-workspace.yaml
 node_modules/**

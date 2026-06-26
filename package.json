@@ -5,6 +5,7 @@
   "license": "MIT",
   "version": "0.1.2",
   "publisher": "FallenMax",
+  "packageManager": "pnpm@11.8.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/fallenmax/naive-definitions"
@@ -22,7 +23,7 @@
     "search"
   ],
   "engines": {
-    "vscode": "^1.0.0"
+    "vscode": "^1.125.0"
   },
   "categories": [
     "Programming Languages"
@@ -87,11 +88,13 @@
     "deploy:cursor": "pnpm package && cursor --install-extension dist/naive-definition.vsix --force"
   },
   "devDependencies": {
-    "@types/node": "^22.3.0",
-    "esbuild": "^0.23.0",
+    "@types/node": "^26.0.1",
+    "@types/vscode": "^1.125.0",
+    "@vscode/vsce": "^3.9.2",
+    "esbuild": "^0.28.1",
     "npm-run-all": "^4.1.5",
-    "typescript": "^5.5.4",
-    "vitest": "^2.0.5",
-    "vscode": "^1.1.37"
+    "typescript": "^6.0.3",
+    "vite": "^8.1.0",
+    "vitest": "^4.1.9"
   }
 }

@@ -1,8 +1,18 @@
-import { exec, ExecOptions, execSync } from 'child_process'
+import {
+  exec,
+  ExecOptions,
+  ExecOptionsWithStringEncoding,
+  execSync,
+} from 'child_process'
 
-export const run = async (command: string, options: ExecOptions = {}) => {
+export async function run(command: string, options: ExecOptions = {}) {
   return new Promise<{ stdout: string; stderr: string }>((resolve, reject) => {
-    exec(command, options, (error, stdout, stderr) => {
+    const execOptions: ExecOptionsWithStringEncoding = {
+      ...options,
+      encoding: 'utf8',
+    }
+
+    exec(command, execOptions, (error, stdout, stderr) => {
       if (error) {
         reject(error)
       } else {
@@ -35,5 +45,6 @@ export function log(...args: any[]) {
   }
 }
 
-export const wait = (time: number) =>
-  new Promise((resolve) => setTimeout(resolve, time))
+export function wait(time: number) {
+  return new Promise((resolve) => setTimeout(resolve, time))
+}

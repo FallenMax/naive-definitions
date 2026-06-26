@@ -17,7 +17,7 @@ function toVscodeLocation({
 }
 
 let rgAvailable: boolean | undefined
-const ensureRg = async () => {
+async function ensureRg() {
   if (rgAvailable == null) {
     const error = checkRg()
     if (error) {
@@ -35,7 +35,7 @@ const ensureRg = async () => {
 
 export function activate(context: vscode.ExtensionContext) {
   const config = vscode.workspace.getConfiguration('naiveDefinitions')
-  const languageConfigs = config.get<LanguageConfigs>('languageConfigs')
+  const languageConfigs = config.get<LanguageConfigs>('languageConfigs') ?? []
   for (const config of languageConfigs) {
     context.subscriptions.push(
       vscode.languages.registerDefinitionProvider(config.languages, {

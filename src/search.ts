@@ -8,7 +8,12 @@ export interface Location {
   column: number
   columnEnd: number
 }
-const parse = (out: string, word: string) => {
+
+function isLocation(location: Location | undefined): location is Location {
+  return location != null
+}
+
+function parse(out: string, word: string): Location[] {
   const locations = out
     .split('\n')
     .filter(Boolean)
@@ -39,7 +44,7 @@ const parse = (out: string, word: string) => {
 
       return found
     })
-    .filter(Boolean)
+    .filter(isLocation)
     .sort((a, b) =>
       a.file === b.file
         ? a.line === b.line
@@ -105,7 +110,7 @@ export async function search({
 /**
  * Compute the nearness score of two files, the lower the score, the closer the files are
  */
-const computeNearnessScore = (fromFile: string, toFile: string): number => {
+function computeNearnessScore(fromFile: string, toFile: string): number {
   if (fromFile === toFile) return 0
   const relativePath = path.relative(path.dirname(fromFile), toFile)
   return relativePath.split(path.sep).length
