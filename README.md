@@ -95,9 +95,9 @@ By default, the extension uses `rg` from `$PATH`.
 Naive Definitions ships with conservative default rules for:
 
 - JavaScript / JSX / TypeScript / TSX / Vue
-  - Variables, functions, classes, object keys, methods, and prototype-style assignments
+  - Variables, functions, async functions, classes, TypeScript type declarations, object keys, methods, modifiers, import aliases, and prototype-style assignments
 - Python
-  - Functions, async functions, classes, assignments, and annotated assignments
+  - Functions, async functions, classes, type aliases, assignments, annotated assignments, walrus assignments, import aliases, and `.pyi` stubs
 - Ruby
   - Methods, singleton methods, classes, modules, assignments, and `attr_*` declarations
 - PHP

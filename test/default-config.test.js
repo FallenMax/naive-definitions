@@ -57,6 +57,33 @@ test('default JavaScript patterns', async () => {
   expect(await find('javascript', 'jsAssigned')).toEqual([
     p('javascript.js', 12, 10, 20),
   ])
+  expect(await find('javascript', 'jsAsyncFunction')).toEqual([
+    p('typescript.ts', 0, 22, 37),
+  ])
+  expect(await find('javascript', 'JsTypeAlias')).toEqual([
+    p('typescript.ts', 2, 5, 16),
+  ])
+  expect(await find('javascript', 'JsInterface')).toEqual([
+    p('typescript.ts', 4, 10, 21),
+  ])
+  expect(await find('javascript', 'JsEnum')).toEqual([
+    p('typescript.ts', 6, 5, 11),
+  ])
+  expect(await find('javascript', 'JsNamespace')).toEqual([
+    p('typescript.ts', 10, 10, 21),
+  ])
+  expect(await find('javascript', 'jsStaticMethod')).toEqual([
+    p('typescript.ts', 13, 9, 23),
+  ])
+  expect(await find('javascript', 'jsAsyncMethod')).toEqual([
+    p('typescript.ts', 14, 8, 21),
+  ])
+  expect(await find('javascript', 'jsGetter')).toEqual([
+    p('typescript.ts', 15, 6, 14),
+  ])
+  expect(await find('javascript', 'jsImportAlias')).toEqual([
+    p('typescript.ts', 20, 23, 36),
+  ])
 })
 
 test('default Python patterns', async () => {
@@ -66,17 +93,32 @@ test('default Python patterns', async () => {
   expect(await find('python', 'py_typed')).toEqual([
     p('python.py', 1, 0, 8),
   ])
+  expect(await find('python', 'PyTypeAlias')).toEqual([
+    p('python.py', 2, 5, 16),
+  ])
+  expect(await find('python', 'py_file')).toEqual([
+    p('python.py', 3, 21, 28),
+  ])
+  expect(await find('python', 'py_walrus')).toEqual([
+    p('python.py', 6, 3, 12),
+  ])
   expect(await find('python', 'py_function')).toEqual([
-    p('python.py', 3, 4, 15),
+    p('python.py', 9, 4, 15),
   ])
   expect(await find('python', 'py_async_function')).toEqual([
-    p('python.py', 6, 10, 27),
+    p('python.py', 12, 10, 27),
   ])
   expect(await find('python', 'PyClass')).toEqual([
-    p('python.py', 9, 6, 13),
+    p('python.py', 15, 6, 13),
   ])
   expect(await find('python', 'py_method')).toEqual([
-    p('python.py', 10, 8, 17),
+    p('python.py', 16, 8, 17),
+  ])
+  expect(await find('python', 'py_stub_function')).toEqual([
+    p('python.pyi', 0, 4, 20),
+  ])
+  expect(await find('python', 'PyStubClass')).toEqual([
+    p('python.pyi', 2, 6, 17),
   ])
 })
 

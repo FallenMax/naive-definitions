@@ -86,10 +86,12 @@
               ],
               "definitionPatterns": [
                 "\\b(?:var|let|const)\\s+[^\\n;]*\\b%s\\b",
-                "\\bfunction\\s+%s\\s*\\(",
+                "\\b(?:async\\s+)?function\\s+%s\\s*\\(",
                 "\\bclass\\s+%s\\b",
-                "^\\s*(?:async\\s+)?%s\\s*\\([^\\)]*\\)\\s*\\{",
+                "\\b(?:type|interface|enum|namespace)\\s+%s\\b",
+                "^\\s*(?:(?:public|private|protected|static|readonly|async|get|set)\\s+)*%s\\s*\\([^\\)]*\\)\\s*\\{",
                 "^\\s*%s\\s*:",
+                "\\bas\\s+%s\\b",
                 "\\.%s\\s*="
               ],
               "referencePatterns": [
@@ -108,16 +110,20 @@
                 "python"
               ],
               "definitionPatterns": [
-                "^\\s*(?:async\\s+)?def\\s+%s\\s*\\(",
+                "^\\s*(?:async\\s+)?def\\s+%s\\b",
                 "^\\s*class\\s+%s\\b",
-                "^\\s*%s\\s*=",
-                "^\\s*%s\\s*:\\s*[^=]+(?:=|$)"
+                "^\\s*type\\s+%s\\b",
+                "^\\s*%s\\s*:",
+                "^\\s*%s\\s*=[^=]",
+                "\\b%s\\s*:=",
+                "\\bas\\s+%s\\b"
               ],
               "referencePatterns": [
                 "\\b%s\\b"
               ],
               "fileGlobs": [
-                "**/*.py"
+                "**/*.py",
+                "**/*.pyi"
               ]
             },
             {
