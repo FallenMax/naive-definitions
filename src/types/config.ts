@@ -1,3 +1,5 @@
+export type FallbackMode = 'whenNoOtherResults' | 'always' | 'never'
+
 export type LanguageConfig = {
   languages: string[]
   /**

@@ -62,27 +62,32 @@ export async function search({
   patterns,
   directory,
   fileGlobs,
+  rgPath = 'rg',
   fromFile,
 }: {
   word: string
   patterns: string[]
   directory: string
   fileGlobs: string[]
+  rgPath?: string
   fromFile?: string
 }): Promise<Location[]> {
   try {
     log('search: ', word)
-    const command = [
-      'rg',
+    const args = [
       '--column',
-      '--color never',
-      '--max-columns 1024', // omit *.min.js results
-      `--max-filesize 1M`, // omit bundled js
-      ...patterns.map((p) => `-e "${p.replace('%s', word)}"`),
-      ...fileGlobs.map((p) => `--glob "${p}"`),
-      `"${directory}"`,
-    ].join(' ')
-    const { stdout, stderr } = await run(command, {
+      '--color',
+      'never',
+      '--max-columns',
+      '1024',
+      '--max-filesize',
+      '1M',
+      ...patterns.flatMap((p) => ['-e', p.replace('%s', word)]),
+      ...fileGlobs.flatMap((p) => ['--glob', p]),
+      directory,
+    ]
+    const { stdout, stderr } = await run(rgPath, args, {
+      allowedExitCodes: [0, 1],
       cwd: directory,
       timeout: 5000,
       maxBuffer: 1024 * 1024 * 10, // 10M

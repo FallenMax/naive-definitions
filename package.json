@@ -1,7 +1,7 @@
 {
   "name": "naive-definitions",
-  "displayName": "Naive Definitions",
-  "description": "Best-effort 'Go to Definition' and 'Find Reference'",
+  "displayName": "Naive Definitions - LSP Fallback",
+  "description": "Curated LSP fallback for Python, Ruby, JavaScript, and other dynamic languages",
   "license": "MIT",
   "version": "0.1.2",
   "publisher": "FallenMax",
@@ -20,21 +20,58 @@
     "reference",
     "find",
     "fuzzy",
-    "search"
+    "search",
+    "fallback",
+    "python",
+    "ruby",
+    "php",
+    "javascript"
   ],
   "engines": {
-    "vscode": "^1.125.0"
+    "vscode": "^1.14.0"
   },
   "categories": [
     "Programming Languages"
   ],
   "activationEvents": [
-    "onStartupFinished"
+    "onLanguage:javascript",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact",
+    "onLanguage:vue",
+    "onLanguage:python",
+    "onLanguage:ruby",
+    "onLanguage:php"
   ],
   "contributes": {
     "configuration": {
       "title": "Naive Definitions",
       "properties": {
+        "naiveDefinitions.definitionFallbackMode": {
+          "type": "string",
+          "enum": [
+            "whenNoOtherResults",
+            "always",
+            "never"
+          ],
+          "default": "whenNoOtherResults",
+          "markdownDescription": "Controls when Naive Definitions should run textual definition search. `whenNoOtherResults` runs only when other definition providers return no results."
+        },
+        "naiveDefinitions.referenceFallbackMode": {
+          "type": "string",
+          "enum": [
+            "whenNoOtherResults",
+            "always",
+            "never"
+          ],
+          "default": "whenNoOtherResults",
+          "markdownDescription": "Controls when Naive Definitions should run textual reference search. `whenNoOtherResults` runs only when other reference providers return no results."
+        },
+        "naiveDefinitions.rgPath": {
+          "type": "string",
+          "default": "rg",
+          "markdownDescription": "Path to the ripgrep executable used for fallback text search."
+        },
         "naiveDefinitions.languageConfigs": {
           "type": "array",
           "markdownDescription": "The configuration for each programming language. \nSee https://github.com/fallenmax/naive-definitions/blob/main/README.md#configuration for more details.",
@@ -48,12 +85,12 @@
                 "vue"
               ],
               "definitionPatterns": [
-                "(var|let|const)[^=]+\\b%s\\b",
-                "\\b%s\\b\\s*=[^=]+",
-                "\\bfunction\\b.*\\b%s\\b",
-                "\\b%s\\b\\s*:",
-                "^\\s*(async|public|private|protected)?\\s*%s\\s*\\([^\\)]*\\)\\s*\\{",
-                "\\bclass\\b.*\\b%s\\b"
+                "\\b(?:var|let|const)\\s+[^\\n;]*\\b%s\\b",
+                "\\bfunction\\s+%s\\s*\\(",
+                "\\bclass\\s+%s\\b",
+                "^\\s*(?:async\\s+)?%s\\s*\\([^\\)]*\\)\\s*\\{",
+                "^\\s*%s\\s*:",
+                "\\.%s\\s*="
               ],
               "referencePatterns": [
                 "\\b%s\\b"
@@ -64,6 +101,59 @@
                 "**/*.ts",
                 "**/*.tsx",
                 "**/*.vue"
+              ]
+            },
+            {
+              "languages": [
+                "python"
+              ],
+              "definitionPatterns": [
+                "^\\s*(?:async\\s+)?def\\s+%s\\s*\\(",
+                "^\\s*class\\s+%s\\b",
+                "^\\s*%s\\s*=",
+                "^\\s*%s\\s*:\\s*[^=]+(?:=|$)"
+              ],
+              "referencePatterns": [
+                "\\b%s\\b"
+              ],
+              "fileGlobs": [
+                "**/*.py"
+              ]
+            },
+            {
+              "languages": [
+                "ruby"
+              ],
+              "definitionPatterns": [
+                "^\\s*def\\s+(?:self\\.)?%s\\b",
+                "^\\s*class\\s+%s\\b",
+                "^\\s*module\\s+%s\\b",
+                "^\\s*%s\\s*=",
+                "\\battr_(?:reader|writer|accessor)\\s+:%s\\b"
+              ],
+              "referencePatterns": [
+                "\\b%s\\b"
+              ],
+              "fileGlobs": [
+                "**/*.rb"
+              ]
+            },
+            {
+              "languages": [
+                "php"
+              ],
+              "definitionPatterns": [
+                "\\bfunction\\s+%s\\s*\\(",
+                "\\bclass\\s+%s\\b",
+                "\\binterface\\s+%s\\b",
+                "\\btrait\\s+%s\\b",
+                "\\$%s\\s*="
+              ],
+              "referencePatterns": [
+                "\\b%s\\b"
+              ],
+              "fileGlobs": [
+                "**/*.php"
               ]
             }
           ],
@@ -89,7 +179,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.0.1",
-    "@types/vscode": "^1.125.0",
+    "@types/vscode": "1.14.0",
     "@vscode/vsce": "^3.9.2",
     "esbuild": "^0.28.1",
     "npm-run-all": "^4.1.5",

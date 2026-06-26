@@ -1,19 +1,27 @@
 import {
-  exec,
-  ExecOptions,
-  ExecOptionsWithStringEncoding,
-  execSync,
+  execFile,
+  ExecFileOptionsWithStringEncoding,
+  execFileSync,
 } from 'child_process'
 
-export async function run(command: string, options: ExecOptions = {}) {
+export type RunOptions = Omit<ExecFileOptionsWithStringEncoding, 'encoding'> & {
+  allowedExitCodes?: number[]
+}
+
+export async function run(
+  command: string,
+  args: string[],
+  options: RunOptions = {},
+) {
   return new Promise<{ stdout: string; stderr: string }>((resolve, reject) => {
-    const execOptions: ExecOptionsWithStringEncoding = {
-      ...options,
+    const { allowedExitCodes = [0], ...optionsWithoutExitCodes } = options
+    const execOptions: ExecFileOptionsWithStringEncoding = {
+      ...optionsWithoutExitCodes,
       encoding: 'utf8',
     }
 
-    exec(command, execOptions, (error, stdout, stderr) => {
-      if (error) {
+    execFile(command, args, execOptions, (error, stdout, stderr) => {
+      if (error && !allowedExitCodes.includes(getExitCode(error.code))) {
         reject(error)
       } else {
         resolve({ stdout, stderr })
@@ -22,9 +30,15 @@ export async function run(command: string, options: ExecOptions = {}) {
   })
 }
 
-export function checkRg(): string | undefined {
+function getExitCode(code: string | number | undefined) {
+  return typeof code === 'number' ? code : 1
+}
+
+export function checkRg(rgPath = 'rg'): string | undefined {
   try {
-    const [rg, version] = execSync('rg -V', { encoding: 'utf8' }).split(' ')
+    const [rg, version] = execFileSync(rgPath, ['-V'], {
+      encoding: 'utf8',
+    }).split(' ')
     if (rg !== 'ripgrep') {
       throw new Error('not found')
     }
@@ -33,7 +47,7 @@ export function checkRg(): string | undefined {
       return 'Require `rg` has version >= 0.10.0, instead it is ' + version
     }
   } catch (error) {
-    return '`rg` (ripgrep) is not found in $PATH, please refer to "naive-definitions" README.md'
+    return `\`${rgPath}\` (ripgrep) is not available. Install ripgrep, make it available in $PATH, or set naiveDefinitions.rgPath.`
   }
 }
 

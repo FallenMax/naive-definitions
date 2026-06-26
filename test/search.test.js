@@ -63,3 +63,7 @@ test('property assign', async () => {
 test('handle spacestabs', async () => {
   expect(await find('a24')).toEqual([p(file1, 39, 8, 11)])
 })
+
+test('no match', async () => {
+  expect(await find('missingWord')).toEqual([])
+})

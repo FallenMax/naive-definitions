@@ -1,33 +1,113 @@
 # Naive Definitions
 
-_Inspired by [Fuzzy Definitions](https://github.com/jrieken/fuzzy-definitions) and [Find All References](https://github.com/gayanhewa/vscode-find-all-references)_
+Naive Definitions is a VS Code fallback navigation extension with curated default patterns for dynamic and weakly typed codebases such as Python, Ruby, JavaScript, TypeScript, Vue, and PHP.
 
-A Visual Studio Code extension that provides "Go to Definition" and "Find All References" functionality for various programming languages, using a fast textual search.
+When existing language services or other providers cannot find definitions or references, it uses ripgrep to run a fast text-based heuristic search.
 
-This extension is helpful when navigating large codebases, especially for weakly-typed languages or languages without good Language Server Protocol (LSP) support, where the built-in IntelliSense engine may fail to provide reliable definitions.
+It is not a replacement for an LSP. Semantic results stay first; text search only steps in when semantic tooling has no answer.
 
-## Features
+---
 
-- Supports "Go to Definition" and "Find All References" for multiple programming languages
-- Configurable language-specific search patterns and file globs
-- Respects `.gitignore` and other ignore files
-- Blazing fast search using [ripgrep](https://github.com/BurntSushi/ripgrep)
+## When To Use It
+
+- Dynamic or weakly typed codebases
+  - Python, Ruby, JavaScript, Vue, PHP, and similar projects can hide symbols behind dynamic exports, runtime registration, framework conventions, or unusual directory layouts.
+- Incomplete language service coverage
+  - Generated files, templates, mixed-format files, and legacy folders may not be covered by a reliable language server.
+- Large codebases where a fallback candidate is better than no navigation
+  - When precise semantic navigation returns nothing, configurable regex patterns can still find useful candidates inside a bounded file set.
+
+This extension is not a good fit for:
+
+- Type-accurate refactoring
+- Distinguishing overloads, lexical scopes, import aliases, or runtime bindings
+- Replacing mature language servers for TypeScript, Python, Go, Rust, and similar ecosystems
+
+---
+
+## How It Works
+
+- You trigger VS Code's built-in Go to Definition or Find References action.
+- Naive Definitions decides whether to run text fallback search.
+  - By default, it does nothing if another definition/reference provider already returned results.
+  - If other providers return no results, it searches with ripgrep.
+- Search behavior is driven by language configuration.
+  - `definitionPatterns` describe what definition candidates look like.
+  - `referencePatterns` describe what reference candidates look like.
+  - `fileGlobs` limit the searched files.
+- Built-in defaults cover JavaScript, TypeScript, Vue, Python, Ruby, and PHP.
+- ripgrep respects `.gitignore` and other ignore files.
+
+---
 
 ## Requirements
 
-- Install [ripgrep](https://github.com/BurntSushi/ripgrep) and make it available in your system's `$PATH` (run `rg` in the command line to verify)
+Install ripgrep and make sure the VS Code extension host can access it.
 
-## Extension Settings
+```bash
+rg --version
+```
 
-This extension contributes the following settings:
+If `rg` is not available on `$PATH`, configure an explicit executable path:
 
-- `naiveDefinitions.languageConfigs`: An array of language-specific configurations, each with the following properties:
-  - `languages`: An array of programming language IDs to enable the extension for.
-  - `definitionPatterns`: An array of regular expression patterns to use when searching for definitions. Use `%s` to represent the word at the cursor position. **Note: These patterns may require escaping special characters depending on your programming language.**
-  - `referencePatterns`: An array of regular expression patterns to use when searching for references. Use `%s` to represent the word at the cursor position. **Note: These patterns may require escaping special characters depending on your programming language.**
-  - `fileGlobs`: An array of file glob patterns to search within.
+```json
+{
+  "naiveDefinitions.rgPath": "/absolute/path/to/rg"
+}
+```
 
-Example configuration:
+---
+
+## Configuration
+
+### Fallback Policy
+
+```json
+{
+  "naiveDefinitions.definitionFallbackMode": "whenNoOtherResults",
+  "naiveDefinitions.referenceFallbackMode": "whenNoOtherResults"
+}
+```
+
+Supported values:
+
+- `whenNoOtherResults`
+  - Default.
+  - Run Naive Definitions only when other providers return no results.
+- `always`
+  - Always run text search.
+  - Useful when you want textual candidates to be included alongside semantic results.
+- `never`
+  - Disable text search for that capability.
+
+### ripgrep Path
+
+```json
+{
+  "naiveDefinitions.rgPath": "rg"
+}
+```
+
+By default, the extension uses `rg` from `$PATH`.
+
+### Curated Defaults
+
+Naive Definitions ships with conservative default rules for:
+
+- JavaScript / JSX / TypeScript / TSX / Vue
+  - Variables, functions, classes, object keys, methods, and prototype-style assignments
+- Python
+  - Functions, async functions, classes, assignments, and annotated assignments
+- Ruby
+  - Methods, singleton methods, classes, modules, assignments, and `attr_*` declarations
+- PHP
+  - Functions, classes, interfaces, traits, and variables
+
+The defaults are intentionally conservative. They prioritize useful fallback candidates over broad matching.
+
+### Custom Language Search Rules
+
+You can override or extend the default language rules:
 
 ```json
 {
@@ -41,35 +121,72 @@ Example configuration:
         "vue"
       ],
       "definitionPatterns": [
-        "(var|let|const)[^=]+\\b%s\\b",
-        "\\b%s\\b\\s=[^=]+"
+        "\\b(?:var|let|const)\\s+[^\\n;]*\\b%s\\b",
+        "\\bfunction\\s+%s\\s*\\(",
+        "\\bclass\\s+%s\\b",
+        "^\\s*(?:async\\s+)?%s\\s*\\([^\\)]*\\)\\s*\\{",
+        "^\\s*%s\\s*:",
+        "\\.%s\\s*="
       ],
-      "referencePatterns": ["\\b%s\\b"],
-      "fileGlobs": ["**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx", "**/*.vue"]
-    },
-    {
-      "languages": ["python"],
-      "definitionPatterns": ["def\\s+%s\\s\\", "class\\s+%s\\s*\\("],
-      "referencePatterns": ["\\b%s\\b"],
-      "fileGlobs": ["**/*.py"]
+      "referencePatterns": [
+        "\\b%s\\b"
+      ],
+      "fileGlobs": [
+        "**/*.js",
+        "**/*.jsx",
+        "**/*.ts",
+        "**/*.tsx",
+        "**/*.vue"
+      ]
     }
   ]
 }
 ```
 
-## Release Notes
+Rule semantics:
 
-### 0.1.0 - Added support for configuring language-specific search patterns and file globs
+- `languages`
+  - VS Code language IDs that should use this rule set.
+- `definitionPatterns`
+  - ripgrep regex patterns used to find definition candidates.
+  - `%s` is replaced with the symbol text at the cursor.
+- `referencePatterns`
+  - ripgrep regex patterns used to find reference candidates.
+- `fileGlobs`
+  - Glob patterns that bound the ripgrep search scope.
 
-- The extension is now activated on-demand when the user invokes the "Go to Definition" or "Find All References" commands, rather than on startup
-- Improved performance by only registering providers for the configured languages
+---
 
-### 0.0.7 - Registered as a "Find All References" provider
+## Limitations
 
-### 0.0.6 - Added Windows support
+- Results are heuristic.
+  - Regex cannot understand scopes, types, module systems, or runtime bindings.
+- Reference search can be broad.
+  - A simple `\\b%s\\b` pattern finds matching text, not necessarily the same symbol.
+- Definition quality depends on pattern quality.
+  - Dynamic registration, macros, decorators, and framework conventions may require project-specific rules.
+- Search depends on ripgrep.
+  - VS Code does not currently expose a stable extension API for reusing its built-in full-text search implementation.
 
-### 0.0.5 - Added support for searching `.vue` files for definitions
+---
 
-### 0.0.2 - Added support for searching `.ts` and `.tsx` files for definitions
+## Development
 
-### 0.0.1 - Initial release
+```bash
+pnpm install
+pnpm test
+pnpm run check-types
+pnpm run build
+pnpm run package
+```
+
+Common scripts:
+
+- `pnpm test`
+  - Run search tests.
+- `pnpm run check-types`
+  - Run TypeScript type checking.
+- `pnpm run build`
+  - Build the production extension bundle.
+- `pnpm run package`
+  - Package a VSIX file.
