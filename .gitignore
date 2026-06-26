@@ -3,3 +3,5 @@ out
 dist
 *.log
 /plans
+tmp/
+.DS_Store

@@ -3,8 +3,9 @@
   "displayName": "Naive Definitions - LSP Fallback",
   "description": "Curated LSP fallback for Python, Ruby, JavaScript, and other dynamic languages",
   "license": "MIT",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "publisher": "FallenMax",
+  "icon": "assets/icon.png",
   "packageManager": "pnpm@11.8.0",
   "repository": {
     "type": "git",

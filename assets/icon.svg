@@ -1,0 +1,21 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path
+    d="M188 18H68C40.3858 18 18 40.3858 18 68V188C18 215.614 40.3858 238 68 238H188C215.614 238 238 215.614 238 188V68C238 40.3858 215.614 18 188 18Z"
+    fill="#06172D" />
+  <path d="M62 86H130ZM62 128H114ZM62 170H130Z" fill="black" />
+  <path d="M62 86H130M62 128H114M62 170H130" stroke="#E5EDF7" stroke-width="13"
+    stroke-linecap="round" />
+  <path d="M62 128H114Z" fill="black" />
+  <path d="M62 128H114" stroke="#FBBF24" stroke-width="13" stroke-linecap="round" />
+  <path
+    d="M62 142C69.732 142 76 135.732 76 128C76 120.268 69.732 114 62 114C54.268 114 48 120.268 48 128C48 135.732 54.268 142 62 142Z"
+    fill="#FBBF24" />
+  <path
+    d="M150 183C180.376 183 205 158.376 205 128C205 97.6243 180.376 73 150 73C119.624 73 95 97.6243 95 128C95 158.376 119.624 183 150 183Z"
+    fill="#06172D" stroke="#22D3EE" stroke-width="16" />
+  <path d="M191 169L222 200Z" fill="black" />
+  <path d="M191 169L222 200" stroke="#22D3EE" stroke-width="19" stroke-linecap="round" />
+  <path d="M168 128H132M149 145L132 128L149 111" stroke="#FBBF24" stroke-width="13"
+    stroke-linecap="round" stroke-linejoin="round" />
+</svg>
+  
