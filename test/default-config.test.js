@@ -38,6 +38,15 @@ function p(file, line, col, colEnd) {
   }
 }
 
+test('default language activations exclude TypeScript editors', () => {
+  expect(
+    packageJson.activationEvents.includes('onLanguage:typescript'),
+  ).toBe(false)
+  expect(
+    packageJson.activationEvents.includes('onLanguage:typescriptreact'),
+  ).toBe(false)
+})
+
 test('default JavaScript patterns', async () => {
   expect(await find('javascript', 'jsValue')).toEqual([
     p('javascript.js', 0, 6, 13),
@@ -83,6 +92,45 @@ test('default JavaScript patterns', async () => {
   ])
   expect(await find('javascript', 'jsImportAlias')).toEqual([
     p('typescript.ts', 20, 23, 36),
+  ])
+})
+
+test('default Lua patterns', async () => {
+  expect(await find('lua', 'lua_value')).toEqual([
+    p('lua.lua', 0, 6, 15),
+  ])
+  expect(await find('lua', 'lua_global')).toEqual([
+    p('lua.lua', 1, 0, 10),
+  ])
+  expect(await find('lua', 'lua_local_function')).toEqual([
+    p('lua.lua', 3, 15, 33),
+  ])
+  expect(await find('lua', 'lua_table_function')).toEqual([
+    p('lua.lua', 6, 18, 36),
+  ])
+  expect(await find('lua', 'lua_assigned_function')).toEqual([
+    p('lua.lua', 9, 9, 30),
+  ])
+})
+
+test('default shell patterns', async () => {
+  expect(await find('shellscript', 'shell_value')).toEqual([
+    p('shell.sh', 0, 0, 11),
+  ])
+  expect(await find('shellscript', 'shell_export')).toEqual([
+    p('shell.sh', 1, 7, 19),
+  ])
+  expect(await find('shellscript', 'shell_readonly')).toEqual([
+    p('shell.sh', 2, 9, 23),
+  ])
+  expect(await find('shellscript', 'shell_local')).toEqual([
+    p('shell.sh', 3, 6, 17),
+  ])
+  expect(await find('shellscript', 'shell_function')).toEqual([
+    p('shell.sh', 5, 0, 14),
+  ])
+  expect(await find('shellscript', 'shell_named_function')).toEqual([
+    p('shell.sh', 9, 9, 29),
   ])
 })
 

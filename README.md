@@ -1,6 +1,6 @@
 # Naive Definitions
 
-Naive Definitions is a VS Code fallback navigation extension with curated default patterns for dynamic and weakly typed codebases such as Python, Ruby, JavaScript, TypeScript, Vue, and PHP.
+Naive Definitions is a VS Code fallback navigation extension with curated default patterns for dynamic and weakly typed codebases such as Python, Ruby, JavaScript, Vue, PHP, Lua, and shell scripts.
 
 When existing language services or other providers cannot find definitions or references, it uses ripgrep to run a fast text-based heuristic search.
 
@@ -11,7 +11,7 @@ It is not a replacement for an LSP. Semantic results stay first; text search onl
 ## When To Use It
 
 - Dynamic or weakly typed codebases
-  - Python, Ruby, JavaScript, Vue, PHP, and similar projects can hide symbols behind dynamic exports, runtime registration, framework conventions, or unusual directory layouts.
+  - Python, Ruby, JavaScript, Vue, PHP, Lua, shell scripts, and similar projects can hide symbols behind dynamic exports, runtime registration, framework conventions, or unusual directory layouts.
 - Incomplete language service coverage
   - Generated files, templates, mixed-format files, and legacy folders may not be covered by a reliable language server.
 - Large codebases where a fallback candidate is better than no navigation
@@ -35,7 +35,7 @@ This extension is not a good fit for:
   - `definitionPatterns` describe what definition candidates look like.
   - `referencePatterns` describe what reference candidates look like.
   - `fileGlobs` limit the searched files.
-- Built-in defaults cover JavaScript, TypeScript, Vue, Python, Ruby, and PHP.
+- Built-in defaults cover JavaScript, Vue, Python, Ruby, PHP, Lua, and shell scripts.
 - ripgrep respects `.gitignore` and other ignore files.
 
 ---
@@ -94,14 +94,18 @@ By default, the extension uses `rg` from `$PATH`.
 
 Naive Definitions ships with conservative default rules for:
 
-- JavaScript / JSX / TypeScript / TSX / Vue
-  - Variables, functions, async functions, classes, TypeScript type declarations, object keys, methods, modifiers, import aliases, and prototype-style assignments
+- JavaScript / JSX / Vue
+  - Variables, functions, async functions, classes, common type-shaped declarations in mixed JS/TS codebases, object keys, methods, modifiers, import aliases, and prototype-style assignments
 - Python
   - Functions, async functions, classes, type aliases, assignments, annotated assignments, walrus assignments, import aliases, and `.pyi` stubs
 - Ruby
   - Methods, singleton methods, classes, modules, assignments, and `attr_*` declarations
 - PHP
   - Functions, classes, interfaces, traits, and variables
+- Lua
+  - Local/global assignments, functions, table functions, and function-valued fields
+- Shell scripts
+  - Function declarations, assignments, and `export` / `readonly` / `local` assignments
 
 The defaults are intentionally conservative. They prioritize useful fallback candidates over broad matching.
 

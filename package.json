@@ -25,7 +25,9 @@
     "python",
     "ruby",
     "php",
-    "javascript"
+    "javascript",
+    "lua",
+    "shell"
   ],
   "engines": {
     "vscode": "^1.14.0"
@@ -36,12 +38,12 @@
   "activationEvents": [
     "onLanguage:javascript",
     "onLanguage:javascriptreact",
-    "onLanguage:typescript",
-    "onLanguage:typescriptreact",
     "onLanguage:vue",
     "onLanguage:python",
     "onLanguage:ruby",
-    "onLanguage:php"
+    "onLanguage:php",
+    "onLanguage:lua",
+    "onLanguage:shellscript"
   ],
   "contributes": {
     "configuration": {
@@ -80,8 +82,6 @@
               "languages": [
                 "javascript",
                 "javascriptreact",
-                "typescript",
-                "typescriptreact",
                 "vue"
               ],
               "definitionPatterns": [
@@ -160,6 +160,41 @@
               ],
               "fileGlobs": [
                 "**/*.php"
+              ]
+            },
+            {
+              "languages": [
+                "lua"
+              ],
+              "definitionPatterns": [
+                "^\\s*(?:local\\s+)?function\\s+(?:[\\w\\.]+\\.)?%s\\s*\\(",
+                "^\\s*local\\s+%s\\s*=",
+                "^\\s*%s\\s*=",
+                "^\\s*(?:[\\w\\.]+\\.)%s\\s*=\\s*function\\s*\\("
+              ],
+              "referencePatterns": [
+                "\\b%s\\b"
+              ],
+              "fileGlobs": [
+                "**/*.lua"
+              ]
+            },
+            {
+              "languages": [
+                "shellscript"
+              ],
+              "definitionPatterns": [
+                "^\\s*(?:function\\s+)?%s\\s*\\(\\s*\\)",
+                "^\\s*%s\\s*=",
+                "^\\s*(?:export|readonly|local)\\s+%s\\s*="
+              ],
+              "referencePatterns": [
+                "\\b%s\\b"
+              ],
+              "fileGlobs": [
+                "**/*.sh",
+                "**/*.bash",
+                "**/*.zsh"
               ]
             }
           ],
